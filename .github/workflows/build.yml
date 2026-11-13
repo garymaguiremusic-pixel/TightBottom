@@ -1,0 +1,67 @@
+name: Build plugin
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure
+        shell: bash
+        run: cmake -B build -A x64 2>&1 | tee configure.log; exit ${PIPESTATUS[0]}
+
+      - name: Build VST3 and unit tests
+        shell: bash
+        run: cmake --build build --config Release --target TightBottom_VST3 TightBottomTests --parallel 2>&1 | tee build.log; exit ${PIPESTATUS[0]}
+
+      - name: Unit tests
+        shell: bash
+        run: ctest --test-dir build -C Release --output-on-failure
+
+      - name: pluginval (strictness 5)
+        shell: bash
+        run: |
+          curl -sSL -o pluginval.zip https://github.com/Tracktion/pluginval/releases/latest/download/pluginval_Windows.zip
+          7z x -y pluginval.zip > /dev/null
+          ./pluginval.exe --strictness-level 5 --validate-in-process --output-dir pluginval-logs \
+            --validate "build/TightBottom_artefacts/Release/VST3/TIGHT BOTTOM.vst3"
+
+      # The zipped plugin goes to a "builds" branch (download it from GitHub) instead of
+      # Actions artifacts, so it never counts against the artifact storage quota.
+      - name: Publish VST3 to builds branch
+        if: github.ref == 'refs/heads/main'
+        shell: bash
+        run: |
+          mkdir out
+          cd build/TightBottom_artefacts/Release/VST3
+          7z a -tzip "$GITHUB_WORKSPACE/out/TIGHT-BOTTOM-VST3-Windows-x64.zip" "TIGHT BOTTOM.vst3"
+          cd "$GITHUB_WORKSPACE/out"
+          git init -q -b builds
+          git config user.name "github-actions"
+          git config user.email "github-actions@users.noreply.github.com"
+          git add .
+          git commit -qm "Plugin build ${GITHUB_SHA::7}"
+          git push -f "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${GITHUB_REPOSITORY}.git" builds
+
+      # Logs are only kept when something goes wrong, and only for a few days.
+      - name: Upload logs on failure
+        if: failure()
+        continue-on-error: true
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-logs
+          retention-days: 3
+          path: |
+            configure.log
+            build.log
+            pluginval-logs/
+            build/CMakeFiles/CMakeConfigureLog.yaml
