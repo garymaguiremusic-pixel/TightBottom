@@ -21,15 +21,20 @@ Input -> IN trim -> S filter (Off / 1 Clean / 2 Shape)
 
 | Control | What it does |
 |---------|--------------|
-| **TIGHT / LOOSE** (big knob) | One macro for the low-band compressor: attack 6 to 30 ms, release 45 to 250 ms, ratio 4:1 to 1.5:1, threshold 6 to 1 dB under the band's own long-term level. Hover it to see the current values |
-| **LOW END** (big knob) | -10 to +10 dB on the low band after the compressor (the punch-back control) |
-| **S** (round button) | Cycles Off, 1 Clean (65 Hz 24 dB/oct high-pass) and 2 Shape (high-pass, -2 dB at 160 Hz, +1.5 dB at 280 Hz). Click-free |
-| **CROSSOVER** + **x2** | Low/high split, 60 to 120 Hz, or 120 to 240 Hz with x2. Default 120 Hz |
+| **LOOSE / TIGHT** (left big knob) | Turn it up for tighter, down for looser. One macro for the low-band compressor: attack 30 to 6 ms, release 250 to 45 ms, ratio 1.5:1 to 4:1, threshold 1 to 6 dB under the band's own long-term level. Hover it to see the current values |
+| **PUNCH** (right big knob) | -10 to +10 dB on the low band after the compressor, to put punch back. With Auto Punch on, it adds even more on top (this is the spec's "Low End" control) |
+| **S** (sonic enhancer, round button) | Cycles Off, 1 Dull (65 Hz 24 dB/oct high-pass) and 2 Bright (high-pass, -2 dB at 160 Hz, +1.5 dB at 280 Hz). Click-free. Use your ears; it differs per track |
+| **CROSSOVER** + **x2** | Everything below the crossover (the blue part of the slider) is tightened. 60 to 120 Hz, or 120 to 240 Hz with x2. Default 120 Hz. Double-click the CROSSOVER name to show the exact frequency |
 | **RELEASE** | Scales the macro's release from x0.5 (FAST) to x2 (SLOW) |
 | **IN / OUT** | -12 to +12 dB trims. OUT comes after Gain Match |
-| **AUTO PUNCH** | Automatic makeup on the low band (inverse of the average GR over about 400 ms). Turning Tight/Loose changes the feel, not the level. On by default |
-| **GAIN MATCH** | Output follows input loudness (K-weighted, about 3 s, max ±12 dB) for a fair A/B with Bypass. Off by default |
-| **BYPASS** | Click-free. It is also the host bypass in Cubase |
+| **AUTO PUNCH** (top corner) | Automatic makeup on the low band (inverse of the average GR over about 400 ms). Turning Tight/Loose changes the feel, not the level. On by default |
+| **GAIN MATCH** (top corner) | Output follows input loudness (K-weighted, about 3 s, max ±12 dB) for a fair A/B with Bypass. Off by default |
+| **BYPASS** (top corner) | Click-free. It is also the host bypass in Cubase |
+
+**Typical use:** turn LOOSE / TIGHT up and watch the dot on the **LOW** meter move left (the low end
+is being held down). Then either turn PUNCH up until the dot bounces around 0, or press Auto
+Punch to do that automatically and use PUNCH to add more weight on top. Gain Match lets you hear
+only the tightening, not a level change.
 
 **Meters:** **GR** (left) shows low-band gain reduction from 0 to -12 dB. The centre meter's
 **LOW** row shows reduction (blue, left of 0) and Auto Punch + Low End (pale, right of 0); the
@@ -37,7 +42,7 @@ dot is the net change. **OUT** shows how far the output level differs from the i
 OUT** are L/R peak meters.
 
 **Knobs and sliders** move in steps of 1 when you drag them or use the scroll wheel (Shift gives
-0.1 steps), and double-click resets them. Hover any control for its value. The window resizes
+0.1 steps), and double-click resets them. Hover any control for its value, or double-click a section name to show its setting in the bottom display. The window resizes
 from 75 to 200 % from the bottom-right corner and remembers its size. All parameters can be
 automated and are saved with the project.
 

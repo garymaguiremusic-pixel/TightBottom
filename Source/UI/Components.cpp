@@ -205,10 +205,11 @@ void SModeButton::mouseDown (const MouseEvent&)
 
 String SModeButton::getTooltip()
 {
-    String t = "S FILTER  " + tbp::getSModeNames()[mode].toUpperCase() + "\n";
-    t << "Off: no filtering\n"
-      << "1 Clean: 24 dB/oct high-pass at " << roundToInt (voicing::sHighPassHz) << " Hz\n"
-      << "2 Shape: high-pass + " << tbp::formatDb (voicing::sBell1GainDb) << " at " << roundToInt (voicing::sBell1Hz)
+    String t = "S (SONIC ENHANCER)  " + tbp::getSModeNames()[mode].toUpperCase() + "\n";
+    t << "Sculpts the sound - use your ears, it differs per track\n"
+      << "Off: no shaping\n"
+      << "1 Dull: 24 dB/oct high-pass at " << roundToInt (voicing::sHighPassHz) << " Hz\n"
+      << "2 Bright: high-pass + " << tbp::formatDb (voicing::sBell1GainDb) << " at " << roundToInt (voicing::sBell1Hz)
       << " Hz + " << tbp::formatDb (voicing::sBell2GainDb) << " at " << roundToInt (voicing::sBell2Hz) << " Hz\n"
       << "Click to cycle";
     return t;
@@ -520,14 +521,14 @@ void HelpOverlay::paint (Graphics& g)
     const char* lines[] =
     {
         "Splits off the low end (kick + bass), compresses it as one band, then lets you add punch back.",
-        "TIGHT / LOOSE:  one macro for attack, release, ratio and threshold depth (hover for values)",
-        "LOW END:  -10 .. +10 dB on the low band after the compressor (the punch-back control)",
-        "S:  Off / 1 Clean (65 Hz 24 dB/oct high-pass) / 2 Shape (high-pass + low-mid dip + body lift)",
-        "CROSSOVER:  where the low band ends (60 - 120 Hz, or 120 - 240 Hz with x2)",
+        "LOOSE / TIGHT:  turn up = tighter. One macro for attack, release, ratio, threshold (hover)",
+        "PUNCH:  -10 .. +10 dB on the low band after the compressor - puts punch back",
+        "S (sonic enhancer):  Off / 1 Dull (65 Hz high-pass) / 2 Bright (+ low-mid dip, body lift)",
+        "CROSSOVER:  everything below (blue) is tightened. Double-click the name for the exact Hz",
         "RELEASE:  scales the macro's release time from x0.5 (FAST) to x2 (SLOW)",
-        "AUTO PUNCH:  automatic makeup on the low band, so Tight/Loose changes feel, not level",
+        "A (AUTO PUNCH):  puts the punch back automatically; PUNCH then adds even more on top",
         "GAIN MATCH:  output follows the input loudness (K-weighted, 3 s) for fair A/B with Bypass",
-        "Meters:  GR (left), LOW = reduction / punch, OUT = level change vs input, IN / OUT peaks",
+        "Meters:  LOW dot moves left as it tightens; add punch until it bounces around 0",
         "Knobs and sliders: drag or scroll wheel in steps of 1, Shift = 0.1, double-click = default",
         "Drag the bottom-right corner to resize.",
         "",

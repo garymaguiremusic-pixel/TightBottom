@@ -12,7 +12,7 @@ namespace
     const Rectangle<float> grilleLeft  { 216.0f, 122.0f, 60.0f, 58.0f };
     const Rectangle<float> grilleRight { 324.0f, 122.0f, 60.0f, 58.0f };
     const Point<float> sCentre { 300.0f, 150.0f };
-    const Rectangle<float> statusBox   { 198.0f, 335.0f, 366.0f, 22.0f };
+    const Rectangle<float> statusBox   { 70.0f, 335.0f, 460.0f, 22.0f };
 }
 
 //==============================================================================
@@ -44,7 +44,7 @@ TightBottomPanel::TightBottomPanel (TightBottomAudioProcessor& p)
     tightKnob.describeValue = [this] (double v) { return describeMacro (v, param (ParamIDs::release)).replace (", ", "\n"); };
     for (VirusKnob* k : { &lowEndKnob, &inKnob, &outKnob })
         k->displayValue = [] (double v) { return formatDb (v); };
-    lowEndKnob.describeValue = [] (double) { return String ("Low-band gain after the compressor (punch back)"); };
+    lowEndKnob.describeValue = [] (double) { return String ("Adds (or removes) low-end punch after the compressor.\nWith Auto Punch on, this adds even more on top."); };
     inKnob.describeValue     = [] (double) { return String ("Input trim"); };
     outKnob.describeValue    = [] (double) { return String ("Output trim (after Gain Match)"); };
 
@@ -62,7 +62,7 @@ TightBottomPanel::TightBottomPanel (TightBottomAudioProcessor& p)
     const std::tuple<TextButton*, const char*, const char*> buttons[] =
     {
         { &x2Button,        ParamIDs::xoverX2,   "x2: doubles the crossover range (120 - 240 Hz)" },
-        { &autoPunchButton, ParamIDs::autoPunch, "Auto Punch: automatic makeup on the low band, so Tight/Loose changes the feel, not the level" },
+        { &autoPunchButton, ParamIDs::autoPunch, "A (Auto Punch): puts the punch back automatically, so Loose/Tight changes the feel, not the level. PUNCH adds more on top" },
         { &gainMatchButton, ParamIDs::gainMatch, "Gain Match: output follows the input loudness (K-weighted, about 3 s) for fair A/B" },
         { &bypassButton,    ParamIDs::bypass,    "Bypass (click-free)" },
     };
@@ -116,6 +116,9 @@ void TightBottomPanel::resized()
     releasePanel = { 314.0f, 258.0f, 132.0f, 64.0f };
     outPanel     = { 452.0f, 258.0f, 140.0f, 64.0f };
 
+    // top corner: A (Auto Punch), Gain Match, Bypass
+    autoPunchButton.setBounds (352, 8, 70, 19);
+    gainMatchButton.setBounds (428, 8, 86, 19);
     bypassButton.setBounds (520, 8, 72, 19);
 
     // TIGHT / LOOSE
@@ -142,8 +145,6 @@ void TightBottomPanel::resized()
     outKnob.setBounds (544, 276, 44, 44);
 
     // bottom bar
-    autoPunchButton.setBounds (8, 335, 88, 22);
-    gainMatchButton.setBounds (102, 335, 88, 22);
     helpButton.setBounds (kWidth - 28, 336, 20, 20);
     helpOverlay.setBounds (getLocalBounds());
 }
@@ -232,16 +233,15 @@ void TightBottomPanel::paint (Graphics& g)
     g.drawHorizontalLine (kTopStripH, 0.0f, (float) kWidth);
 
     drawWordmark (g, { 14.0f, 0.0f, 260.0f, (float) kTopStripH });
-    CustomLookAndFeel::drawSmallLabel (g, "Low-End Tightener", { 300.0f, 8.0f, 200.0f, 19.0f }, Justification::centredRight);
 
     // --- main panels ------------------------------------------------------------------
-    CustomLookAndFeel::drawPanel (g, leftPanel,   "Tight / Loose");
+    CustomLookAndFeel::drawPanel (g, leftPanel,   "Loose / Tight");
     CustomLookAndFeel::drawPanel (g, centrePanel, "Low Band");
-    CustomLookAndFeel::drawPanel (g, rightPanel,  "Low End");
+    CustomLookAndFeel::drawPanel (g, rightPanel,  "Punch");
 
     // Tight / Loose: end labels under the knob, GR label
-    CustomLookAndFeel::drawSmallLabel (g, "Tight", { 52.0f, 188.0f, 64.0f, 14.0f });
-    CustomLookAndFeel::drawSmallLabel (g, "Loose", { 128.0f, 188.0f, 64.0f, 14.0f });
+    CustomLookAndFeel::drawSmallLabel (g, "Loose", { 52.0f, 188.0f, 64.0f, 14.0f });
+    CustomLookAndFeel::drawSmallLabel (g, "Tight", { 128.0f, 188.0f, 64.0f, 14.0f });
     CustomLookAndFeel::drawSmallLabel (g, "GR", { 12.0f, 222.0f, 28.0f, 14.0f }, Justification::centredLeft);
 
     // Low End: -10 / 0 / +10
@@ -258,7 +258,7 @@ void TightBottomPanel::paint (Graphics& g)
     CustomLookAndFeel::drawGrille (g, grilleRight, sCentre, 40.0f);
 
     const int sMode = jlimit (0, 2, roundToInt (param (ParamIDs::sMode)));
-    const String sText[] = { "S Filter  Off", "S1  Clean", "S2  Shape" };
+    const String sText[] = { "S Enhancer  Off", "S1  Dull", "S2  Bright" };
     g.setFont (CustomLookAndFeel::uiFont (11.0f, true));
     g.setColour (sMode > 0 ? VirusColours::blue : VirusColours::labelText);
     g.drawText (sText[sMode].toUpperCase(), Rectangle<float> (206.0f, 188.0f, 188.0f, 14.0f), Justification::centred);
@@ -295,7 +295,9 @@ void TightBottomPanel::paint (Graphics& g)
     CustomLookAndFeel::drawInsetBox (g, statusBox, 3.0f);
     g.setFont (CustomLookAndFeel::uiFont (13.0f, true));
     g.setColour (Colour (0xffc8cdd2));
-    g.drawText ("TIGHT BOTTOM", statusBox, Justification::centred);
+    const bool showMessage = Time::getMillisecondCounterHiRes() < statusUntilMs;
+    if (showMessage) g.setColour (VirusColours::blue);
+    g.drawText (showMessage ? statusMessage : String ("TIGHT BOTTOM"), statusBox, Justification::centred);
 }
 
 //==============================================================================
@@ -316,7 +318,7 @@ void TightBottomPanel::timerCallback()
 
     const float tl = param (ParamIDs::tightLoose);
     tightLcd.setContent ("FEEL", describeTightLoose (tl));
-    lowEndLcd.setContent ("LOW END", formatDb (param (ParamIDs::lowEnd)));
+    lowEndLcd.setContent ("PUNCH", formatDb (param (ParamIDs::lowEnd)));
 
     const auto macro = tb::macroSettings (knobToTightness (tl), sliderToReleaseScale (param (ParamIDs::release)));
     macroLcd.setContent ({}, "ATT " + formatMs (macro.attackMs) + "  REL " + formatMs (macro.releaseMs)
@@ -325,11 +327,45 @@ void TightBottomPanel::timerCallback()
     // repaint the static labels when S mode or x2 change (also from automation)
     const int labelState = roundToInt (param (ParamIDs::sMode)) * 2 + (param (ParamIDs::xoverX2) > 0.5f ? 1 : 0)
                          + 8 * roundToInt (param (ParamIDs::crossover) * 10.0f) + 8 * 4096 * roundToInt (param (ParamIDs::release) * 10.0f);
+    if (statusUntilMs > 0.0 && now >= statusUntilMs)
+    {
+        statusUntilMs = 0.0;
+        repaint (statusBox.toNearestInt());
+    }
     if (labelState != lastLabelState)
     {
         lastLabelState = labelState;
         repaint();
     }
+}
+
+//==============================================================================
+void TightBottomPanel::showStatus (const String& text)
+{
+    statusMessage = text;
+    statusUntilMs = Time::getMillisecondCounterHiRes() + 2500.0;
+    repaint (statusBox.toNearestInt());
+}
+
+void TightBottomPanel::mouseDoubleClick (const MouseEvent& e)
+{
+    // Double-click a section name to see exactly where it is set.
+    const auto p = e.position;
+    const auto header = [] (Rectangle<float> r) { return r.withHeight (18.0f); };
+    const bool x2 = param (ParamIDs::xoverX2) > 0.5f;
+
+    if (header (xoverPanel).contains (p))
+        showStatus ("CROSSOVER  " + formatHz (crossoverHz (param (ParamIDs::crossover), x2))
+                    + "  -  everything below is tightened");
+    else if (header (releasePanel).contains (p))
+    {
+        const auto m = tb::macroSettings (knobToTightness (param (ParamIDs::tightLoose)), sliderToReleaseScale (param (ParamIDs::release)));
+        showStatus ("RELEASE  " + formatMs (m.releaseMs));
+    }
+    else if (header (leftPanel).contains (p))
+        showStatus (describeMacro (param (ParamIDs::tightLoose), param (ParamIDs::release)).toUpperCase());
+    else if (header (rightPanel).contains (p))
+        showStatus ("PUNCH  " + formatDb (param (ParamIDs::lowEnd)));
 }
 
 //==============================================================================

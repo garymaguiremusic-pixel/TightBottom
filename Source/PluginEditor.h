@@ -30,8 +30,8 @@ private:
     CustomLookAndFeel lnf;
     juce::Image background;
 
-    VirusKnob tightKnob  { VirusKnob::Size::Large, "Tight / Loose" };
-    VirusKnob lowEndKnob { VirusKnob::Size::Large, "Low End", true };
+    VirusKnob tightKnob  { VirusKnob::Size::Large, "Loose / Tight" };
+    VirusKnob lowEndKnob { VirusKnob::Size::Large, "Punch", true };
     VirusKnob inKnob     { VirusKnob::Size::Small, "In" };
     VirusKnob outKnob    { VirusKnob::Size::Small, "Out" };
     VirusSlider crossoverSlider { "Crossover" };
@@ -58,6 +58,11 @@ private:
     juce::Rectangle<float> leftPanel, centrePanel, rightPanel, inPanel, xoverPanel, releasePanel, outPanel;
     double lastTimerMs = 0.0;
     int lastLabelState = -1;
+    juce::String statusMessage;          // shown in the bottom display for a moment
+    double statusUntilMs = 0.0;
+
+    void mouseDoubleClick (const juce::MouseEvent&) override;
+    void showStatus (const juce::String&);
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (TightBottomPanel)
 };
