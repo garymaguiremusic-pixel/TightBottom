@@ -144,7 +144,7 @@ void VirusKnob::paint (Graphics& g)
         if ((isHovering() || isDragging()) && isEnabled())
         {
             g.setFont (CustomLookAndFeel::uiFont (11.0f, true));
-            g.setColour (VirusColours::blue);
+            g.setColour (VirusColours::accent);
             g.drawFittedText (valueText (getValue()), labelArea.toNearestInt(), Justification::centred, 1, 0.7f);
         }
         else
@@ -226,7 +226,7 @@ void SModeButton::paint (Graphics& g)
     // recessed bezel
     g.setColour (Colours::black.withAlpha (0.65f));
     g.fillEllipse (outer.translated (0.0f, 1.5f));
-    g.setGradientFill (ColourGradient (Colour (0xff15171a), c.x, outer.getY(), Colour (0xff3a3e43), c.x, outer.getBottom(), false));
+    g.setGradientFill (ColourGradient (VirusColours::insetTop, c.x, outer.getY(), VirusColours::headerTop, c.x, outer.getBottom(), false));
     g.fillEllipse (outer);
 
     // glow ring
@@ -235,22 +235,22 @@ void SModeButton::paint (Graphics& g)
     {
         for (int i = 4; i > 0; --i)
         {
-            g.setColour (VirusColours::blueGlow.withAlpha (0.10f * (float) i));
+            g.setColour (VirusColours::accentGlow.withAlpha (0.10f * (float) i));
             g.drawEllipse (ring.expanded ((float) i * 1.2f), 1.6f);
         }
-        g.setColour (VirusColours::blue);
+        g.setColour (VirusColours::accent);
         g.drawEllipse (ring, 2.4f);
     }
     else
     {
-        g.setColour (Colour (0xff1a2633));
+        g.setColour (VirusColours::arcTrack);
         g.drawEllipse (ring, 2.4f);
     }
 
     // cap
     const auto cap = ring.reduced (d * 0.07f);
-    auto top = on ? Colour (0xff2f86e0) : Colour (0xff4a4f55);
-    auto bottom = on ? Colour (0xff123f73) : Colour (0xff1f2225);
+    auto top = on ? VirusColours::orangeTop : VirusColours::knobCapTop;
+    auto bottom = on ? VirusColours::orangeBottom : VirusColours::knobCapBottom;
     if (hover) { top = top.brighter (0.15f); bottom = bottom.brighter (0.15f); }
     g.setGradientFill (ColourGradient (top, c.x, cap.getY(), bottom, c.x, cap.getBottom(), false));
     g.fillEllipse (cap);
@@ -264,15 +264,15 @@ void SModeButton::paint (Graphics& g)
     g.setFont (Font (FontOptions (d * 0.46f, Font::bold | Font::italic)));
     g.setColour (Colours::black.withAlpha (0.45f));
     g.drawText ("S", cap.translated (0.0f, 1.0f), Justification::centred);
-    g.setColour (on ? Colours::white : Colour (0xff9aa1a8));
+    g.setColour (on ? Colours::white : VirusColours::labelText);
     g.drawText ("S", cap, Justification::centred);
 
     if (on)
     {
         const auto badge = Rectangle<float> (d * 0.28f, d * 0.28f).withCentre ({ cap.getRight() - d * 0.08f, cap.getBottom() - d * 0.08f });
-        g.setColour (Colour (0xff0b0c0e));
+        g.setColour (VirusColours::insetTop);
         g.fillEllipse (badge);
-        g.setColour (VirusColours::blue);
+        g.setColour (VirusColours::accent);
         g.drawEllipse (badge, 1.0f);
         g.setColour (Colours::white);
         g.setFont (CustomLookAndFeel::uiFont (d * 0.2f, true));
@@ -309,8 +309,9 @@ void LcdDisplay::paint (Graphics& g)
     g.setColour (Colours::black.withAlpha (0.35f));
     g.drawFittedText (nameText, nameArea.translated (0, 1), Justification::centredLeft, 1, 0.75f);
     g.drawFittedText (valueText, textArea.translated (0.0f, 1.0f).toNearestInt(), valueJust, 1, 0.75f);
-    g.setColour (Colours::white);
+    g.setColour (VirusColours::lightGrey);          // name: light grey
     g.drawFittedText (nameText, nameArea, Justification::centredLeft, 1, 0.75f);
+    g.setColour (VirusColours::accent);             // value: orange
     g.drawFittedText (valueText, textArea.toNearestInt(), valueJust, 1, 0.75f);
 }
 
@@ -321,19 +322,27 @@ namespace
 {
     float gainToDbF (float g) { return g > 1.0e-6f ? 20.0f * std::log10 (g) : -120.0f; }
 
-    void fillBar (Graphics& g, Rectangle<float> bar, Colour colour)
+    /** Filled meter segment: vertical gradient top -> bottom with a faint glow. */
+    void fillBar (Graphics& g, Rectangle<float> bar, Colour top = VirusColours::orangeTop,
+                  Colour bottom = VirusColours::orangeBottom, Colour glow = VirusColours::accentGlow)
     {
         if (bar.getWidth() <= 0.0f || bar.getHeight() <= 0.0f)
             return;
-        g.setColour (colour.withAlpha (0.25f));
+        g.setColour (glow.withAlpha (0.25f));
         g.fillRect (bar.expanded (0.0f, 1.5f));
-        g.setGradientFill (ColourGradient (colour.brighter (0.35f), 0.0f, bar.getY(), colour.darker (0.25f), 0.0f, bar.getBottom(), false));
+        g.setGradientFill (ColourGradient (top, 0.0f, bar.getY(), bottom, 0.0f, bar.getBottom(), false));
         g.fillRect (bar);
+    }
+
+    /** The "hot" variant (punch / level boost, top of the level meters). */
+    void fillBarLight (Graphics& g, Rectangle<float> bar)
+    {
+        fillBar (g, bar, Colours::white, VirusColours::accentLight, VirusColours::accent);
     }
 
     void drawDot (Graphics& g, Point<float> p)
     {
-        g.setColour (VirusColours::blue.withAlpha (0.45f));
+        g.setColour (VirusColours::accentGlow.withAlpha (0.45f));
         g.fillEllipse (Rectangle<float> (7.0f, 7.0f).withCentre (p));
         g.setColour (Colours::white);
         g.fillEllipse (Rectangle<float> (4.0f, 4.0f).withCentre (p));
@@ -371,13 +380,13 @@ void PeakMeter::paint (Graphics& g)
     for (int c = 0; c < 2; ++c)
     {
         const auto row = Rectangle<float> (inner.getX(), inner.getY() + (float) c * (rowH + 2.0f), inner.getWidth(), rowH);
-        g.setColour (Colour (0xff1a2633));
+        g.setColour (VirusColours::arcTrack);
         g.fillRect (row);
 
         const float x = xOf (shown[c]);
-        fillBar (g, row.withRight (std::min (x, xOf (-6.0f))), VirusColours::blueGlow);
-        if (x > xOf (-6.0f)) fillBar (g, row.withLeft (xOf (-6.0f)).withRight (std::min (x, xOf (0.0f))), VirusColours::blue.brighter (0.5f));
-        if (x > xOf (0.0f))  fillBar (g, row.withLeft (xOf (0.0f)).withRight (x), VirusColours::red);
+        fillBar (g, row.withRight (std::min (x, xOf (-6.0f))));
+        if (x > xOf (-6.0f)) fillBarLight (g, row.withLeft (xOf (-6.0f)).withRight (std::min (x, xOf (0.0f))));
+        if (x > xOf (0.0f))  fillBar (g, row.withLeft (xOf (0.0f)).withRight (x), VirusColours::red, VirusColours::red.darker (0.3f), VirusColours::red);
 
         if (hold[c] > minDb)
         {
@@ -405,15 +414,15 @@ void GrMeter::paint (Graphics& g)
     auto inner = barArea.reduced (2.5f, 3.0f);
     const auto yOf = [&] (float db) { return inner.getY() + inner.getHeight() * (-db / 12.0f); };
 
-    g.setColour (Colour (0xff1a2633));
+    g.setColour (VirusColours::arcTrack);
     g.fillRect (inner);
 
     if (shown < -0.05f)
     {
         auto bar = inner.withBottom (yOf (shown));
-        g.setColour (VirusColours::blueGlow.withAlpha (0.3f));
+        g.setColour (VirusColours::accentGlow.withAlpha (0.3f));
         g.fillRect (bar.expanded (1.0f, 0.0f));
-        g.setGradientFill (ColourGradient (VirusColours::blue.brighter (0.3f), bar.getX(), 0.0f, VirusColours::blueGlow, bar.getRight(), 0.0f, false));
+        g.setGradientFill (ColourGradient (VirusColours::orangeTop, bar.getX(), 0.0f, VirusColours::orangeBottom, bar.getRight(), 0.0f, false));
         g.fillRect (bar);
     }
     if (hold < -0.05f)
@@ -471,7 +480,7 @@ void GainChangeMeter::paint (Graphics& g)
         const auto row = Rectangle<float> (barsX, b.getY() + 3.0f + (float) r * (rowH + gap), barsW, rowH);
         CustomLookAndFeel::drawSmallLabel (g, labels[r], Rectangle<float> (b.getX(), row.getY() - 3.0f, labelW - 4.0f, rowH + 6.0f), Justification::centredLeft);
         CustomLookAndFeel::drawInsetBox (g, row.expanded (2.0f, 2.0f), 2.0f);
-        g.setColour (Colour (0xff1a2633));
+        g.setColour (VirusColours::arcTrack);
         g.fillRect (row);
         g.setColour (Colours::white.withAlpha (0.35f));
         g.drawVerticalLine ((int) xOf (0.0f), row.getY() - 1.0f, row.getBottom() + 1.0f);
@@ -479,15 +488,15 @@ void GainChangeMeter::paint (Graphics& g)
         const float x0 = xOf (0.0f);
         if (r == 0)
         {
-            fillBar (g, row.withLeft (xOf (gr)).withRight (x0), VirusColours::blue);
-            if (boost > 0.0f) fillBar (g, row.withLeft (x0).withRight (xOf (boost)), Colour (0xffc9e6ff));
-            else              fillBar (g, row.withLeft (xOf (boost)).withRight (x0).reduced (0.0f, 2.5f), Colour (0xffc9e6ff));
+            fillBar (g, row.withLeft (xOf (gr)).withRight (x0));
+            if (boost > 0.0f) fillBarLight (g, row.withLeft (x0).withRight (xOf (boost)));
+            else              fillBarLight (g, row.withLeft (xOf (boost)).withRight (x0).reduced (0.0f, 2.5f));
             drawDot (g, { xOf (gr + boost), row.getCentreY() });
         }
         else
         {
-            if (delta >= 0.0f) fillBar (g, row.withLeft (x0).withRight (xOf (delta)), Colour (0xffc9e6ff));
-            else               fillBar (g, row.withLeft (xOf (delta)).withRight (x0), VirusColours::blue);
+            if (delta >= 0.0f) fillBarLight (g, row.withLeft (x0).withRight (xOf (delta)));
+            else               fillBar (g, row.withLeft (xOf (delta)).withRight (x0));
             drawDot (g, { xOf (delta), row.getCentreY() });
         }
     }
@@ -501,8 +510,8 @@ void HelpButton::paintButton (Graphics& g, bool isHighlighted, bool isDown)
     auto b = getLocalBounds().toFloat().reduced (1.0f);
     g.setColour (Colours::black.withAlpha (0.6f));
     g.fillEllipse (b.translated (0.0f, 1.0f));
-    g.setGradientFill (ColourGradient (isHighlighted ? Colour (0xff8a9096) : Colour (0xff6f757b), 0.0f, b.getY(),
-                                       Colour (0xff35393d), 0.0f, b.getBottom(), false));
+    g.setGradientFill (ColourGradient (isHighlighted ? VirusColours::darkTop.brighter (0.12f) : VirusColours::darkTop, 0.0f, b.getY(),
+                                       VirusColours::darkBottom, 0.0f, b.getBottom(), false));
     g.fillEllipse (isDown ? b.reduced (0.5f) : b);
     g.setColour (VirusColours::bevelDark);
     g.drawEllipse (b, 1.0f);
@@ -524,7 +533,7 @@ void HelpOverlay::paint (Graphics& g)
         "LOOSE / TIGHT:  turn up = tighter. One macro for attack, release, ratio, threshold (hover)",
         "PUNCH:  -10 .. +10 dB on the low band after the compressor - puts punch back",
         "S (sonic enhancer):  Off / 1 Dull (65 Hz high-pass) / 2 Bright (+ low-mid dip, body lift)",
-        "CROSSOVER:  everything below (blue) is tightened. Double-click the name for the exact Hz",
+        "CROSSOVER:  everything below (orange) is tightened. Double-click the name for the exact Hz",
         "RELEASE:  scales the macro's release time from x0.5 (FAST) to x2 (SLOW)",
         "A (AUTO PUNCH):  puts the punch back automatically; PUNCH then adds even more on top",
         "GAIN MATCH:  output follows the input loudness (K-weighted, 3 s) for fair A/B with Bypass",
@@ -539,7 +548,7 @@ void HelpOverlay::paint (Graphics& g)
     g.setFont (CustomLookAndFeel::uiFont (12.0f));
     for (auto* line : lines)
     {
-        g.setColour (String (line).startsWith ("Click") ? VirusColours::blue : Colour (0xffdfe3e6));
+        g.setColour (String (line).startsWith ("Click") ? VirusColours::accent : VirusColours::buttonText);
         g.drawFittedText (line, text.removeFromTop (21.0f).toNearestInt(), Justification::centredLeft, 1, 0.8f);
     }
 }

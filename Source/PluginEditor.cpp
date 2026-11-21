@@ -158,7 +158,7 @@ void TightBottomPanel::createBackground()
     Graphics g (background);
     g.addTransform (AffineTransform::scale (2.0f));
 
-    g.setGradientFill (ColourGradient (Colour (0xff3b3e42), 0.0f, 0.0f, Colour (0xff1e2023), 0.0f, (float) kHeight, false));
+    g.setGradientFill (ColourGradient (VirusColours::windowTop, 0.0f, 0.0f, VirusColours::windowBottom, 0.0f, (float) kHeight, false));
     g.fillAll();
 
     Random rng (0x7a11);
@@ -182,7 +182,7 @@ void TightBottomPanel::createBackground()
 
 void TightBottomPanel::drawWordmark (Graphics& g, Rectangle<float> area)
 {
-    // Original stylised lowercase wordmark: chrome "tight", blue "bottom", and a swoosh.
+    // Original stylised lowercase wordmark: chrome "tight", orange "bottom", and a swoosh.
     const float baseline = area.getBottom() - 7.0f;
 
     GlyphArrangement main;
@@ -205,7 +205,7 @@ void TightBottomPanel::drawWordmark (Graphics& g, Rectangle<float> area)
     second.createPath (secondPath);
     g.setColour (Colours::black.withAlpha (0.5f));
     g.fillPath (secondPath, AffineTransform::translation (1.0f, 1.0f));
-    g.setColour (VirusColours::blue);
+    g.setColour (VirusColours::accent);
     g.fillPath (secondPath);
 
     Path swoosh;
@@ -213,7 +213,7 @@ void TightBottomPanel::drawWordmark (Graphics& g, Rectangle<float> area)
     const float ex = secondPath.getBounds().getRight();
     swoosh.startNewSubPath (sx, sy);
     swoosh.quadraticTo ((sx + ex) * 0.5f, sy + 3.5f, ex + 6.0f, sy - 2.0f);
-    g.setGradientFill (ColourGradient (VirusColours::blue.withAlpha (0.0f), sx, sy, VirusColours::blue, ex, sy, false));
+    g.setGradientFill (ColourGradient (VirusColours::accent.withAlpha (0.0f), sx, sy, VirusColours::accent, ex, sy, false));
     g.strokePath (swoosh, PathStrokeType (1.6f, PathStrokeType::curved, PathStrokeType::rounded));
 }
 
@@ -223,7 +223,7 @@ void TightBottomPanel::paint (Graphics& g)
 
     // --- top strip ----------------------------------------------------------------
     auto top = Rectangle<float> (0.0f, 0.0f, (float) kWidth, (float) kTopStripH);
-    g.setGradientFill (ColourGradient (Colour (0xff4a4e53), 0.0f, 0.0f, Colour (0xff2b2e32), 0.0f, top.getBottom(), false));
+    g.setGradientFill (ColourGradient (VirusColours::stripTop, 0.0f, 0.0f, VirusColours::stripBottom, 0.0f, top.getBottom(), false));
     g.fillRect (top);
     g.setColour (Colours::white.withAlpha (0.18f));
     g.drawHorizontalLine (0, 0.0f, (float) kWidth);
@@ -260,7 +260,7 @@ void TightBottomPanel::paint (Graphics& g)
     const int sMode = jlimit (0, 2, roundToInt (param (ParamIDs::sMode)));
     const String sText[] = { "S Enhancer  Off", "S1  Dull", "S2  Bright" };
     g.setFont (CustomLookAndFeel::uiFont (11.0f, true));
-    g.setColour (sMode > 0 ? VirusColours::blue : VirusColours::labelText);
+    g.setColour (sMode > 0 ? VirusColours::accent : VirusColours::labelText);
     g.drawText (sText[sMode].toUpperCase(), Rectangle<float> (206.0f, 188.0f, 188.0f, 14.0f), Justification::centred);
 
     // --- bottom row -------------------------------------------------------------------
@@ -276,7 +276,7 @@ void TightBottomPanel::paint (Graphics& g)
     {
         // live values between the end labels
         g.setFont (CustomLookAndFeel::uiFont (11.0f, true));
-        g.setColour (VirusColours::blue);
+        g.setColour (VirusColours::accent);
         g.drawText (formatHz (crossoverHz (param (ParamIDs::crossover), x2)), Rectangle<float> (185.0f, 300.0f, 60.0f, 14.0f), Justification::centred);
         g.drawText ("x" + String (sliderToReleaseScale (param (ParamIDs::release)), 2), Rectangle<float> (350.0f, 300.0f, 60.0f, 14.0f), Justification::centred);
     }
@@ -287,16 +287,16 @@ void TightBottomPanel::paint (Graphics& g)
 
     // --- bottom bar -------------------------------------------------------------------
     auto bar = Rectangle<float> (0.0f, (float) kBottomBarY, (float) kWidth, (float) (kHeight - kBottomBarY));
-    g.setGradientFill (ColourGradient (Colour (0xff17191b), 0.0f, bar.getY(), Colour (0xff0c0d0e), 0.0f, bar.getBottom(), false));
+    g.setGradientFill (ColourGradient (VirusColours::barTop, 0.0f, bar.getY(), VirusColours::barBottom, 0.0f, bar.getBottom(), false));
     g.fillRect (bar);
     g.setColour (Colours::white.withAlpha (0.1f));
     g.drawHorizontalLine (kBottomBarY, 0.0f, (float) kWidth);
 
     CustomLookAndFeel::drawInsetBox (g, statusBox, 3.0f);
     g.setFont (CustomLookAndFeel::uiFont (13.0f, true));
-    g.setColour (Colour (0xffc8cdd2));
+    g.setColour (VirusColours::lightGrey);
     const bool showMessage = Time::getMillisecondCounterHiRes() < statusUntilMs;
-    if (showMessage) g.setColour (VirusColours::blue);
+    if (showMessage) g.setColour (VirusColours::accent);
     g.drawText (showMessage ? statusMessage : String ("TIGHT BOTTOM"), statusBox, Justification::centred);
 }
 

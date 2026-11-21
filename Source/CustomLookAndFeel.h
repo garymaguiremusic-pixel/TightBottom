@@ -5,24 +5,51 @@
 //==============================================================================
 namespace VirusColours
 {
-    const juce::Colour background   { 0xff2a2d31 };
-    const juce::Colour panelTop     { 0xff34373b };
-    const juce::Colour panelBottom  { 0xff25282b };
-    const juce::Colour headerTop    { 0xff74797f };
-    const juce::Colour headerBottom { 0xff50555a };
-    const juce::Colour headerText   { 0xffe3e6e8 };
-    const juce::Colour labelText    { 0xffb9bec3 };
-    const juce::Colour bevelDark    { 0xff0e0f11 };
-    const juce::Colour bevelLight   { 0x33ffffff };
-    const juce::Colour insetTop     { 0xff0b0c0e };
-    const juce::Colour insetBottom  { 0xff1c1f22 };
-    const juce::Colour lcdTop       { 0xff2a74c9 };
-    const juce::Colour lcdBottom    { 0xff144a92 };
-    const juce::Colour lcdDimTop    { 0xff40464d };
-    const juce::Colour lcdDimBottom { 0xff2b3035 };
-    const juce::Colour blue         { 0xff3fa9ff };
-    const juce::Colour blueGlow     { 0xff1f7fe0 };
-    const juce::Colour red          { 0xffff3b30 };
+    // Black, with orange as the only accent, light grey for text and labels and
+    // white for highlights (same theme as LeadVerb).
+    const juce::Colour background   { 0xff0e0e0f };   // window background
+    const juce::Colour panelTop     { 0xff1b1b1d };   // panel body (vertical gradient)
+    const juce::Colour panelBottom  { 0xff111112 };
+    const juce::Colour headerTop    { 0xff2e2e31 };   // panel header bars
+    const juce::Colour headerBottom { 0xff1e1e20 };
+    const juce::Colour headerText   { 0xffd9d9db };   // panel titles
+    const juce::Colour labelText    { 0xffb4b4b8 };   // small labels
+    const juce::Colour lightGrey    { 0xffc8c8cc };   // tick marks, LCD names, product name
+    const juce::Colour buttonText   { 0xffdfe3e6 };   // text on dark (off) buttons, help text
+    const juce::Colour popupText    { 0xffe8ebee };
+    const juce::Colour dimText      { 0xff6e6e72 };   // inactive LCD text
+    const juce::Colour bevelDark    { 0xff000000 };   // outlines, recess edges, dark divider half
+    const juce::Colour bevelLight   { 0x22ffffff };   // highlight edge of recessed panels
+    const juce::Colour insetTop     { 0xff050505 };   // recessed boxes (meters, fields)
+    const juce::Colour insetBottom  { 0xff141415 };
+    const juce::Colour lcdTop       { 0xff1c1714 };   // LCD readouts (black glass)
+    const juce::Colour lcdBottom    { 0xff0b0908 };
+    const juce::Colour lcdDimTop    { 0xff171718 };
+    const juce::Colour lcdDimBottom { 0xff0c0c0d };
+    const juce::Colour accent       { 0xffff7a1a };   // orange: the one accent colour
+    const juce::Colour accentGlow   { 0xffe8600c };   // glow around orange elements
+    const juce::Colour accentLight  { 0xffffd2a8 };   // hot core of orange arcs / lit elements
+    const juce::Colour red          { 0xffff3b30 };   // clip / warnings only
+
+    // fixed shades
+    const juce::Colour orangeTop    { 0xffff8a2a };   // orange gradient: lit buttons, meter fills
+    const juce::Colour orangeBottom { 0xffc4520a };
+    const juce::Colour darkTop      { 0xff343437 };   // dark gradient: unlit buttons
+    const juce::Colour darkBottom   { 0xff1a1a1c };
+    const juce::Colour arcTrack     { 0xff2a1a10 };   // recessed track under orange arcs / sliders / meters
+    const juce::Colour popupBack    { 0xff121213 };   // popup menu background
+    const juce::Colour tooltipBack  { 0xf0121213 };   // tooltip (slightly see-through)
+    const juce::Colour popupHilite  { 0xffc4520a };   // highlighted popup item
+    const juce::Colour knobRimTop   { 0xff5a5a5e };   // small black knobs / slider thumbs
+    const juce::Colour knobRimBottom{ 0xff0a0a0b };
+    const juce::Colour knobCapTop   { 0xff2c2c2f };
+    const juce::Colour knobCapBottom{ 0xff0d0d0e };
+    const juce::Colour windowTop    { 0xff1a1a1c };   // window background gradient
+    const juce::Colour windowBottom { 0xff070708 };
+    const juce::Colour stripTop     { 0xff222224 };   // top strip
+    const juce::Colour stripBottom  { 0xff111112 };
+    const juce::Colour barTop       { 0xff121213 };   // bottom bar
+    const juce::Colour barBottom    { 0xff050505 };
 }
 
 //==============================================================================

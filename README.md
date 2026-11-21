@@ -3,7 +3,8 @@
 A low-end tightener (VST3, Windows) for the mix bus, drum bus or master, built with JUCE 8.
 It splits off the kick and bass with a Linkwitz-Riley crossover, glues them with a single
 low-band compressor whose threshold follows the music, then lets you add punch back.
-The GUI uses the same procedural look as Virus Delay. It has no bitmaps, and the name,
+The GUI uses the procedural controls of Virus Delay in the black-and-orange LeadVerb colour theme
+(all colours are in `VirusColours` in `Source/CustomLookAndFeel.h`). It has no bitmaps, and the name,
 wordmark and artwork are original.
 
 ![screenshot](docs/screenshot.png)
@@ -127,7 +128,7 @@ Source/
   Parameters.h                 parameter IDs, ranges, value text
   PluginProcessor.h/.cpp       APVTS, bypass, state save/restore
   PluginEditor.h/.cpp          layout, background, meters, resizable wrapper
-  CustomLookAndFeel.h/.cpp     procedural knobs, sliders, panels, LCDs (Virus Delay look)
+  CustomLookAndFeel.h/.cpp     procedural knobs, sliders, panels, LCDs, colour palette
   UI/Components.h/.cpp         knob/slider interaction, S button, meters, help
   DSP/Filters.h                biquad, TPT SVF, LR4 crossover, K-weighting
   DSP/LowBandCompressor.h      RMS detector, auto threshold, soft knee, Tight/Loose, Auto Punch
